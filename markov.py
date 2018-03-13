@@ -59,8 +59,14 @@ def make_text(chains):
     """Return text from chains."""
 
     words = []
-
-    # your code goes here
+    keys = chains.keys()
+    link = choice(keys)
+    words.extend(link)
+    next_word = choice(chains[link])
+    while next_word is not None:
+        words.append(next_word)
+        link = (link[1], next_word)
+        next_word = choice(chains[link])
 
     return " ".join(words)
 
@@ -69,9 +75,10 @@ input_path = "green-eggs.txt"
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
+
 # Get a Markov chain
 chains = make_chains(input_text)
-print chains
+
 # Produce random text
 random_text = make_text(chains)
 
