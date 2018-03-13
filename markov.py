@@ -1,7 +1,8 @@
 """Generate Markov text from text files."""
 
-from random import choice
+from os.path import isfile
 from sys import argv
+from random import choice
 
 
 def open_and_read_file(file_path):
@@ -38,19 +39,20 @@ def make_chains(text_string, n_gram=2):
         >>> chains[('there','juanita')]
         [None]
     """
+
     chains = {}
     words = text_string.split()
-    for i in range(len(lst) - n_gram + 1):
+    for i in range(len(words) - n_gram + 1):
         key_list = []
         for j in range(n_gram):
-            key_list.append(lst[i+j])
+            key_list.append(words[i+j])
         key_tuple = tuple(key_list)
 
         try:
             if key_tuple in chains:
-                chains[key_tuple].append(lst[i+n_gram])
+                chains[key_tuple].append(words[i+n_gram])
             else:
-                chains[key_tuple] = [lst[i+n_gram]]
+                chains[key_tuple] = [words[i+n_gram]]
         except IndexError:
             chains[key_tuple] = [None]
 
@@ -61,9 +63,7 @@ def make_text(chains):
     """Return text from chains."""
 
     words = []
-    keys = chains.keys()
-    keys = [key for key in keys if key[0][0].isupper()]
-    link = choice(keys)
+    link = choice([key for key in chains.keys() if key[0][0].isupper()])
     words.extend(link)
 
     next_word = choice(chains[link])
@@ -81,11 +81,18 @@ def make_text(chains):
     return " ".join(words)
 
 
-if len(argv) > 1:
-    input_path = argv[2]
-else:
-    # input_path = "green-eggs.txt"
-    input_path = "gettysburg.txt"
+def get_file_path():
+    """Check path arguments for filename, else use gettysburg.txt"""
+
+    if len(argv) > 1:
+        if isfile(argv[1]):
+            return argv[1]
+        else:
+            print "{} is not a file. Using gettysburg.txt as default.".format(argv[1])
+    return "gettysburg.txt"
+
+
+input_path = get_file_path()
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
@@ -93,11 +100,11 @@ input_text = open_and_read_file(input_path)
 # Get a Markov chain
 chains = make_chains(input_text)
 
-input_path = "green-eggs.txt"
-input_text = open_and_read_file(input_path)
-add_to_chains = make_chains(input_text)
+# input_path = "green-eggs.txt"
+# input_text = open_and_read_file(input_path)
+# add_to_chains = make_chains(input_text)
 
-chains.update(add_to_chains)
+# chains.update(add_to_chains)
 
 # Produce random text
 random_text = make_text(chains)
