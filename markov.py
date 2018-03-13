@@ -11,8 +11,9 @@ def open_and_read_file(file_path):
     """
 
     # your code goes here
+    file_string = open(file_path).read()
 
-    return "Contents of your file as one long string"
+    return file_string
 
 
 def make_chains(text_string):
@@ -35,14 +36,21 @@ def make_chains(text_string):
 
         >>> chains[('hi', 'there')]
         ['mary', 'juanita']
-        
+
         >>> chains[('there','juanita')]
         [None]
     """
-
     chains = {}
-
-    # your code goes here
+    lst = text_string.split()
+    for i in range(len(lst)-1):
+        key_tuple = (lst[i], lst[i+1])
+        try:
+            if key_tuple in chains:
+                chains[key_tuple].append(lst[i+2])
+            else:
+                chains[key_tuple] = [lst[i+2]]
+        except IndexError:
+            chains[key_tuple] = [None]
 
     return chains
 
@@ -61,10 +69,9 @@ input_path = "green-eggs.txt"
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
-
 # Get a Markov chain
 chains = make_chains(input_text)
-
+print chains
 # Produce random text
 random_text = make_text(chains)
 
