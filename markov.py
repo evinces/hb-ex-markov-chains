@@ -2,7 +2,7 @@
 
 from os.path import isfile
 from sys import argv
-from random import choice
+from random import choice, randint
 
 
 def open_and_read_file(file_path):
@@ -130,6 +130,10 @@ def make_text(chains):
             next_word = choice(chains[link])
             words.append(next_word)
 
+            if next_word[-1] in ".!?" and next_word[0] not in "MS":
+                if randint(0, 2) == 0:
+                    break
+
             link_list = []
             for i in range(1, len(link)):
                 link_list.append(link[i])
@@ -155,13 +159,27 @@ def get_file_path():
     # return "gettysburg.txt"
 
 
+def get_ngrams():
+    """Check path arguments for integer, use as n_gram."""
+
+    if len(argv) > 2:
+        try:
+            n_gram = int(argv[2])
+        except ValueError:
+            n_gram = 2
+    else:
+        n_gram = 2
+    return n_gram
+
+
 input_path = get_file_path()
+n_gram = get_ngrams()
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
-chains = make_chains(input_text)
+chains = make_chains(input_text, n_gram)
 
 # more_chains = make_chains(open_and_read_file("gettysburg.txt"))
 # chains.update(more_chains)
@@ -169,4 +187,6 @@ chains = make_chains(input_text)
 # Produce random text
 random_text = make_text(chains)
 
+print "source file: {}, n_gram: {}".format(input_path, n_gram)
+print ""
 print random_text
