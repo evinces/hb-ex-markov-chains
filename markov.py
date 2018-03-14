@@ -5,14 +5,17 @@ from sys import argv
 from random import choice, randint
 
 
-def open_and_read_file(file_path):
+def open_and_read_file(file_paths):
     """Take file path as string; return text as string.
 
     Takes a string that is a file path, opens the file, and turns
     the file's contents as one string of text.
     """
+    texts = []
+    for path in file_paths:
+        texts.append(open(path).read())
 
-    return open(file_path).read()
+    return texts
 
 
 # def make_chains(text_string, n_gram=2):
@@ -148,23 +151,24 @@ def make_text(chains):
 def get_file_path():
     """Check path arguments for filename, else use green-eggs.txt"""
 
-    if len(argv) > 1:
-        if isfile(argv[1]):
-            return argv[1]
-        else:
-            print "{file} is not a file.".format(file=argv[1])
-            print "Using green-eggs.txt as default."
+    files = []
+    if len(argv) > 2:
+        for arg in argv[2:]:
+            if isfile(arg):
+                files.append(arg)
 
-    return "green-eggs.txt"
-    # return "gettysburg.txt"
+    if len(files) == 0:
+        files.append("green-eggs.txt")
+
+    return files
 
 
 def get_ngrams():
     """Check path arguments for integer, use as n_gram."""
 
-    if len(argv) > 2:
+    if len(argv) > 1:
         try:
-            n_gram = int(argv[2])
+            n_gram = int(argv[1])
         except ValueError:
             n_gram = 2
     else:
@@ -172,21 +176,18 @@ def get_ngrams():
     return n_gram
 
 
-input_path = get_file_path()
+file_paths = get_file_path()
 n_gram = get_ngrams()
 
 # Open the file and turn it into one long string
-input_text = open_and_read_file(input_path)
+input_texts = open_and_read_file(file_paths)
 
 # Get a Markov chain
-chains = make_chains(input_text, n_gram)
-
-# more_chains = make_chains(open_and_read_file("gettysburg.txt"))
-# chains.update(more_chains)
+chains = {}
+for text in input_texts:
+    chains.update(make_chains(text, n_gram))
 
 # Produce random text
 random_text = make_text(chains)
 
-print "source file: {}, n_gram: {}".format(input_path, n_gram)
-print ""
 print random_text
