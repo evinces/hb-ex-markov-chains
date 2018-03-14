@@ -109,16 +109,12 @@ def make_chains(text_string, n_gram=2):
     chains = {}
     words = text_string.split()
     for i in range(len(words) - n_gram):
-        key_list = []
-        for j in range(n_gram):
-            key_list.append(words[i+j])
-        key_tuple = tuple(key_list)
+        link = tuple(words[i: i + n_gram])
 
-        if key_tuple in chains:
-            chains[key_tuple].append(words[i+n_gram])
+        if link in chains:
+            chains[link].append(words[i+n_gram])
         else:
-            chains[key_tuple] = [words[i+n_gram]]
-
+            chains[link] = [words[i+n_gram]]
     return chains
 
 
@@ -152,7 +148,7 @@ def get_file_path():
         if isfile(argv[1]):
             return argv[1]
         else:
-            print "{} is not a file.".format(argv[1])
+            print "{file} is not a file.".format(file=argv[1])
             print "Using green-eggs.txt as default."
 
     return "green-eggs.txt"
@@ -166,6 +162,9 @@ input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
 chains = make_chains(input_text)
+
+# more_chains = make_chains(open_and_read_file("gettysburg.txt"))
+# chains.update(more_chains)
 
 # Produce random text
 random_text = make_text(chains)
